@@ -21,7 +21,7 @@ import (
 func getTelephone(w http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
 
-	telephone, err := conn.GetTelephoneByNumber(number)
+	telephone, err := telephoneRepository.GetTelephoneByNumber(number)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to get a record: %s\n", err)
@@ -46,7 +46,7 @@ func getTelephone(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @success 200 {string} telephone-json
 func listTelephone(w http.ResponseWriter, r *http.Request) {
-	telephone, err := conn.ListTelephone()
+	telephone, err := telephoneRepository.ListTelephone()
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to select table: %s\n", err.Error())
@@ -62,6 +62,13 @@ func listTelephone(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(tj))
 }
 
+// postTelephone
+// @summary post a telephone information
+// @description register one telephone information by number
+// @router /telephones [post]
+// @tags telephone
+// @produce json
+// @success 200 {string} telephone-json
 func postTelephone(w http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
 
@@ -85,52 +92,44 @@ func postTelephone(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(400), 400)
 	}
 
-	err = conn.PostTelephone(ownerId, iccId, number)
-
-	if err != nil {
+	if err = telephoneRepository.PostTelephone(ownerId, iccId, number); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to insert a record: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
 	}
 }
 
-//func putTelephone(w http.ResponseWriter, r *http.Request) {
-//	number := chi.URLParam(r, "number")
-//
-//	reqBody := map[string]string{}
-//	decoder := json.NewDecoder(r.Body)
-//	if err := decoder.Decode(&reqBody); err != nil {
-//		fmt.Fprintf(os.Stderr, "failed to execute json decode on postTelephone: %s\n", err)
-//		http.Error(w, http.StatusText(400), 400)
-//	}
-//
-//	if _, err := isTelephoneExists(number); err != nil {
-//		fmt.Fprintf(os.Stderr, "failed to get a telephone by given number_code(%s): %s\n", number, err)
-//		http.Error(w, http.StatusText(400), 400)
-//	}
-//
-//	defer r.Body.Close()
-//
-//	if _, err := conn.PutTelephone(reqBody["name"], reqBody["owner_id"], number); err != nil {
-//		fmt.Fprintf(os.Stderr, "failed to update the record: %s\n", err)
-//	}
-//}
-//
-//func isTelephoneExists(number string) (bool, error) {
-//	rows, err := conn.GetTelephone(number)
-//	if err != nil {
-//		return false, fmt.Errorf("failed to get a record: %w", err)
-//	}
-//
-//	var vs []Telephone
-//	for rows.Next() {
-//		var v Telephone
-//		rows.Scan(&v.ID, &v.Name, &v.NACCSCode, &v.OwnerID)
-//		vs = append(vs, v)
-//	}
-//
-//	if len(vs) != 1 {
-//		return false, fmt.Errorf("telephone length was not 1 (actual: %d)", len(vs))
-//	}
-//
-//	return true, nil
-//}
+func putTelephone(w http.ResponseWriter, r *http.Request) {
+	number := chi.URLParam(r, "number")
+
+	reqBody := map[string]string{}
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&reqBody); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to execute json decode on postTelephone: %s\n", err)
+		http.Error(w, http.StatusText(400), 400)
+	}
+
+	ownerId, err := strconv.Atoi(reqBody["owner_id"])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to covert owner_id in request body to integer on putTelephone: %s\n", err)
+		http.Error(w, http.StatusText(400), 400)
+	}
+	iccId, err := strconv.Atoi(reqBody["icc_id"])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to covert icc_id in request body to integer on putTelephone: %s\n", err)
+		http.Error(w, http.StatusText(400), 400)
+	}
+
+	defer r.Body.Close()
+
+	_, err = telephoneRepository.GetTelephoneByNumber(number)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to get a record: %s\n", err)
+		http.Error(w, http.StatusText(400), 400)
+	}
+
+	if err := telephoneRepository.PutTelephoneByNumber(number, ownerId, iccId); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to update a record: %s\n", err)
+		http.Error(w, http.StatusText(400), 400)
+	}
+}

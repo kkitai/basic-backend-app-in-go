@@ -9,32 +9,42 @@ import (
 	"gorm.io/gorm"
 )
 
-type TelephoneAccesscer interface {
-	GetTelephoneByNumber() (*model.Telephone, error)
-	ListTelephone() (*model.Telephone, error)
-	PostTelephone() (*model.Telephone, error)
-	PutTelephoneByNumber() (*model.Telephone, error)
+type TelephoneRepository interface {
+	GetTelephoneByNumber(string) (*model.Telephone, error)
+	ListTelephone() ([]*model.Telephone, error)
+	PostTelephone(int, int, string) error
+	PutTelephoneByNumber(string, int, int) error
 }
 
-func (d *DB) GetTelephoneByNumber(number string) (*model.Telephone, error) {
+type telephoneRepository struct {
+	connection *gorm.DB
+}
+
+func NewTelephoneRepository(conn *gorm.DB) TelephoneRepository {
+	return &telephoneRepository{
+		connection: conn,
+	}
+}
+
+func (t *telephoneRepository) GetTelephoneByNumber(number string) (*model.Telephone, error) {
 	if number == "" {
 		return &model.Telephone{}, fmt.Errorf("empty number was given")
 	}
 
 	var telephone *model.Telephone
-	err := d.Connection.Where("number = ?", number).First(&telephone).Error
+	err := t.connection.Where("number = ?", number).First(&telephone).Error
 
 	return telephone, err
 }
 
-func (d *DB) ListTelephone() ([]*model.Telephone, error) {
+func (t *telephoneRepository) ListTelephone() ([]*model.Telephone, error) {
 	var telephones []*model.Telephone
-	err := d.Connection.Find(&telephones).Error
+	err := t.connection.Find(&telephones).Error
 
 	return telephones, err
 }
 
-func (d *DB) PostTelephone(ownerId int, iccId int, number string) error {
+func (t *telephoneRepository) PostTelephone(ownerId int, iccId int, number string) error {
 	telephone := &model.Telephone{
 		OwnerId: ownerId,
 		Number:  number,
@@ -45,12 +55,10 @@ func (d *DB) PostTelephone(ownerId int, iccId int, number string) error {
 			DeletedAt: gorm.DeletedAt{},
 		},
 	}
-	tx := d.Connection.Create(telephone)
-	return tx.Error
+	return t.connection.Create(telephone).Error
 }
 
-func (d *DB) PutTelephoneByNumber(number string, ownerId, iccId int) error {
+func (t *telephoneRepository) PutTelephoneByNumber(number string, ownerId, iccId int) error {
 	var telephone *model.Telephone
-	tx := d.Connection.Model(telephone).Where("number = ?", number).Updates(map[string]interface{}{"owner_id": ownerId, "icc_id": iccId})
-	return tx.Error
+	return t.connection.Model(telephone).Where("number = ?", number).Updates(map[string]interface{}{"owner_id": ownerId, "icc_id": iccId}).Error
 }

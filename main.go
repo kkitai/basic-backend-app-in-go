@@ -15,14 +15,13 @@ import (
 )
 
 type Env struct {
-	// TODO: implement passing a logger to handler
 	LogLevel   string `default:"error"`
 	Port       uint16 `default:"3000"`
-	DBHost     string
+	DBHost     string `default:"localhost"`
 	DBPort     string `default:"5432"`
-	DBName     string
-	DBUser     string
-	DBPassword string
+	DBName     string `required:"true"`
+	DBUser     string `required:"true"`
+	DBPassword string `required:"true"`
 }
 
 // @title          Basic Back-end REST APP in go
@@ -41,17 +40,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	db, err := db.NewDB(env.DBHost, env.DBPort, env.DBUser, env.DBPassword, env.DBName)
-
+	// initialize db connection
+	conn, err := db.NewDBConnection(env.DBHost, env.DBPort, env.DBUser, env.DBPassword, env.DBName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to create db connection: %s\n", err.Error())
 		os.Exit(1)
 	}
 
+	// initialize telephone service
+	tr := db.NewTelephoneRepository(conn)
+
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
-	h := handler.NewHandler(db)
+	h := handler.NewHandler(tr)
 	server := &http.Server{
 		Addr:    ":" + strconv.FormatUint(uint64(env.Port), 10),
 		Handler: h,

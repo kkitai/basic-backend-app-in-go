@@ -57,9 +57,10 @@ func TestGetTelephoneByNumber(t *testing.T) {
 				WillReturnRows(NewMockRow(mock, tt.mockOwnerIds, []string{tt.inputNumber}, tt.mockICCIds, tt.mockIds, tt.mockCreatedAts, tt.mockUpdatedAts, tt.mockDeletedAts))
 
 			// execute the test fuction
-			var db DB
-			db.Connection = mdb
-			tel, err := db.GetTelephoneByNumber(tt.inputNumber)
+			tr := telephoneRepository{
+				connection: mdb,
+			}
+			tel, err := tr.GetTelephoneByNumber(tt.inputNumber)
 
 			// assertion
 			if tel.ID != tt.mockIds[0] {
@@ -115,9 +116,10 @@ func TestListTelephone(t *testing.T) {
 				WillReturnRows(NewMockRow(mock, tt.mockOwnerIds, tt.mockNumbers, tt.mockICCIds, tt.mockIds, tt.mockCreatedAts, tt.mockUpdatedAts, tt.mockDeletedAts))
 
 			// execute the test fuction
-			var db DB
-			db.Connection = mdb
-			tels, err := db.ListTelephone()
+			tr := telephoneRepository{
+				connection: mdb,
+			}
+			tels, err := tr.ListTelephone()
 
 			// assertion
 			if len(tels) != len(tt.mockIds) {
@@ -146,6 +148,55 @@ func TestPostTelephone(t *testing.T) {
 			inputOwnerId: 1,
 			inputICCId:   111111111111111,
 			mockId:       1,
+			hasErr:       false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.description, func(t *testing.T) {
+			mdb, mock, err := NewDbMock()
+			if err != nil {
+				t.Fatalf("an error '%s' was not expect when opening a stub database connection", err)
+			}
+
+			// mocking the results of db query
+			rows := sqlmock.NewRows([]string{"id"}).AddRow(tt.mockId)
+			mock.ExpectBegin()
+			mock.ExpectQuery(regexp.QuoteMeta(
+				`INSERT INTO "telephones"`)).
+				WillReturnRows(rows)
+			mock.ExpectCommit()
+
+			// execute the test function
+			tr := telephoneRepository{
+				connection: mdb,
+			}
+			err = tr.PostTelephone(tt.inputOwnerId, tt.inputICCId, tt.inputNumber)
+
+			// assertion
+			if !tt.hasErr && err != nil {
+				t.Errorf(`an error '%s' was not expect`, err)
+			}
+		})
+	}
+}
+
+func TestPutTelephoneByNumber(t *testing.T) {
+
+	cases := []struct {
+		description  string
+		inputNumber  string
+		inputOwnerId int
+		inputICCId   int
+		mockId       uint
+		hasErr       bool
+	}{
+		{
+			description:  "when correct arguments are given, it returns nil",
+			inputNumber:  "09011112222",
+			inputOwnerId: 1,
+			inputICCId:   111111111111111,
+			mockId:       1,
 			hasErr:       true,
 		},
 	}
@@ -158,17 +209,19 @@ func TestPostTelephone(t *testing.T) {
 			}
 
 			// mocking the results of db query
-			rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
+			rows := sqlmock.NewRows([]string{"id"}).AddRow(tt.mockId)
 			mock.ExpectBegin()
 			mock.ExpectQuery(regexp.QuoteMeta(
-				`INSERT INTO "telephones"`)).
+				`UPDATE telephones SET (.+)`)).
+				WithArgs(tt.inputICCId, tt.inputOwnerId, AnyTime{}, tt.inputNumber).
 				WillReturnRows(rows)
 			mock.ExpectCommit()
 
 			// execute the test function
-			var db DB
-			db.Connection = mdb
-			err = db.PostTelephone(tt.inputOwnerId, tt.inputICCId, tt.inputNumber)
+			tr := telephoneRepository{
+				connection: mdb,
+			}
+			err = tr.PutTelephoneByNumber(tt.inputNumber, tt.inputOwnerId, tt.inputICCId)
 
 			// assertion
 			if !tt.hasErr && err != nil {

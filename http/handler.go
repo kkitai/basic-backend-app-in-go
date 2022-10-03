@@ -11,9 +11,9 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-var conn *db.DB
+var telephoneRepository db.TelephoneRepository
 
-func NewHandler(d *db.DB) http.Handler {
+func NewHandler(tr db.TelephoneRepository) http.Handler {
 	r := chi.NewRouter()
 
 	// TODO: pass an arbitrary logger
@@ -34,7 +34,7 @@ func NewHandler(d *db.DB) http.Handler {
 		})
 	})
 
-	conn = d
+	telephoneRepository = tr
 
 	return r
 }
