@@ -1,0 +1,70 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "sample implementation of back-end rest api written in go.",
+        "title": "Basic Back-end REST APP in go",
+        "contact": {
+            "name": "kkitai",
+            "url": "https://github.com/kkitai",
+            "email": "nmgys043@gmail.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "paths": {
+        "/telephones": {
+            "get": {
+                "description": "returns all telephone informations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "telephone"
+                ],
+                "summary": "list telephone informations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/telephones/{number}": {
+            "get": {
+                "description": "returns one telephone information by telephone number",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "telephone"
+                ],
+                "summary": "get a telephone information",
+                "parameters": [
+                    {
+                        "minLength": 11,
+                        "type": "string",
+                        "description": "telephone number",
+                        "name": "number",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

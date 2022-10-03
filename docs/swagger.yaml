@@ -1,0 +1,47 @@
+host: localhost:3000
+info:
+  contact:
+    email: nmgys043@gmail.com
+    name: kkitai
+    url: https://github.com/kkitai
+  description: sample implementation of back-end rest api written in go.
+  license:
+    name: MIT
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Basic Back-end REST APP in go
+  version: "1.0"
+paths:
+  /telephones:
+    get:
+      description: returns all telephone informations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: list telephone informations
+      tags:
+      - telephone
+  /telephones/{number}:
+    get:
+      description: returns one telephone information by telephone number
+      parameters:
+      - description: telephone number
+        in: path
+        minLength: 11
+        name: number
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: get a telephone information
+      tags:
+      - telephone
+swagger: "2.0"
