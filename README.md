@@ -2,7 +2,7 @@
 
 basic-backend-app-in-go is a sample implementation of basic back-end application with RDBMS ( I use postgresql at this time ).
 
-## Run Application
+## How to run application
 
 ### Prepare Docker Image
 ```
@@ -11,57 +11,60 @@ $ docker run --rm -d \
      --name postgres \
      -e POSTGRES_PASSWORD=password \
      -e PGDATA=/var/lib/postgresql/data/pgdata \
-     -e POSTGRES_DB=basic_backend_app_in_go
+     -e POSTGRES_DB=basic_backend_app_in_go \
      -v ${PWD}/data:/var/lib/postgresql/data \
      -p 5432:5432 \
      postgres
 
-$ docker exec -it basic-backend-app-in-go-postgres /bin/bash
+$ docker exec -it postgres /bin/bash
 # psql -h localhost -p 5432 -U postgres
-```
-
-Create a database.
-
-```
-CREATE DATABASE basic_backend_app_in_go;
 ```
 
 ### Migrate Database
 
 ```
-$ go run migrate/migrate.go
+$ MYAPP_DBUSER=postgres MYAPP_DBPASSWORD=password MYAPP_DBNAME=basic_backend_app_in_go go run migrate/migrate.go
 ```
 
 ### Run
 ```
-$ MYAPP_DBHOST=localhost MYAPP_DBUSER=postgres MYAPP_DBPASSWORD=password MYAPP_DBNAME=basic_backend_app_in_go go run main.go
+$ MYAPP_DBUSER=postgres MYAPP_DBPASSWORD=password MYAPP_DBNAME=basic_backend_app_in_go go run main.go
 ```
 
-### API Document
+## Documentation
 
+### API Doc
 after run the application, see swagger api document.
 ```
 $ curl http://localhost:3000/swagger
 ```
 
-# get
-$ curl http://localhost:3000/telephones/<number>
+### Sample Request
 
-# list
-# /telephones
+Get a telephone information
+
+```
+$ curl http://localhost:3000/telephones/090222233333
+```
+
+List all telephone informations
+
+```
 $ curl http://localhost:3000/telephones
+```
 
-# post
-# vessels/<naccs_code>
-$ curl -X POST -H "Content-Type: application/json" http://localhost:3000/vessels/3EDD7  -d '{"name" : "A KOU", "owner_id": "13DF"}'
+Post a telephone information
 
-# put the vessel
-# vessels/<naccs_code>
+```
+$ curl -X POST -H "Content-Type: application/json" http://localhost:3000/telephones/08033332222 -d '{"owner_id" : "2", "icc_id": "111111111111111"}'
+```
+
+```
 $ curl -X PUT -H "Content-Type: application/json" http://localhost:3000/vessels/3EDD7  -d '{"name" : "BOKU IKEMEN", "owner_id": "44DF"}'
 ```
 
 ## Testing
 
 ```
-$ go test ./...
+$ make test
 ```

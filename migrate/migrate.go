@@ -1,19 +1,31 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/kelseyhightower/envconfig"
 	"github.com/kkitai/basic-backend-app-in-go/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-type Product struct {
-	gorm.Model
-	Code  string
-	Price uint
+type Env struct {
+	DBHost     string `default:"localhost"`
+	DBPort     string `default:"5432"`
+	DBName     string `required:"true"`
+	DBUser     string `required:"true"`
+	DBPassword string `required:"true"`
 }
 
 func main() {
-	dsn := "host=localhost user=postgres password=password dbname=basic_backend_app_in_go port=5432 sslmode=disable TimeZone=Asia/Tokyo"
+	var env Env
+	if err := envconfig.Process("myapp", &env); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to load environment variables: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	dsn := fmt.Sprintf(`host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Tokyo`, env.DBHost, env.DBUser, env.DBPassword, env.DBName, env.DBPort)
 
 	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {
