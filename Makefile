@@ -1,5 +1,11 @@
+SRC = main.go
+
 init:
-	$(eval APP_NAME := $(shell echo "hoge"))
+	$(eval APP_NAME := $(shell basename $(CURDIR)))
 
 build: init
-	go build -o $(APP_NAME) ./main.go
+	go build -o $(APP_NAME) $(SRC)
+
+test:
+	go test ./...
+
