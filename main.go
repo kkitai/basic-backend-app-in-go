@@ -12,8 +12,12 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/kkitai/basic-backend-app-in-go/db"
 	handler "github.com/kkitai/basic-backend-app-in-go/http"
+	"github.com/kkitai/basic-backend-app-in-go/repository"
 )
 
+// TODO: add comments to all structures and functions
+
+// Env represents application environments.
 type Env struct {
 	LogLevel   string `default:"error"`
 	Port       uint16 `default:"3000"`
@@ -48,7 +52,7 @@ func main() {
 	}
 
 	// initialize telephone service
-	tr := db.NewTelephoneRepository(conn)
+	tr := repository.NewTelephoneRepository(conn)
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()

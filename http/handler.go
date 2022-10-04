@@ -5,15 +5,15 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/kkitai/basic-backend-app-in-go/db"
 	_ "github.com/kkitai/basic-backend-app-in-go/docs"
+	"github.com/kkitai/basic-backend-app-in-go/repository"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-var telephoneRepository db.TelephoneRepository
+var telephoneRepository repository.TelephoneRepository
 
-func NewHandler(tr db.TelephoneRepository) http.Handler {
+func NewHandler(tr repository.TelephoneRepository) http.Handler {
 	r := chi.NewRouter()
 
 	// TODO: pass an arbitrary logger
