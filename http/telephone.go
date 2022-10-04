@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/render"
 )
 
 // getTelephone
@@ -96,6 +97,11 @@ func postTelephone(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(os.Stderr, "failed to insert a record: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
 	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, map[string]interface{}{
+		"message": http.StatusText(201),
+	})
 }
 
 func putTelephone(w http.ResponseWriter, r *http.Request) {
