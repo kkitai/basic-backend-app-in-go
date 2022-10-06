@@ -26,6 +26,7 @@ type Env struct {
 	DBName     string `required:"true"`
 	DBUser     string `required:"true"`
 	DBPassword string `required:"true"`
+	DBSSLMode  bool   `default:"true"`
 }
 
 // @title          Basic Back-end REST APP in go
@@ -45,7 +46,7 @@ func main() {
 	}
 
 	// initialize db connection
-	conn, err := db.NewDBConnection(env.DBHost, env.DBPort, env.DBUser, env.DBPassword, env.DBName)
+	conn, err := db.NewDBConnection(env.DBHost, env.DBPort, env.DBUser, env.DBPassword, env.DBName, db.SSLMode(false))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to create db connection: %s\n", err.Error())
 		os.Exit(1)
