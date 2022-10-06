@@ -24,6 +24,51 @@ paths:
       summary: list telephone informations
       tags:
       - telephone
+    post:
+      description: register one telephone information by number
+      parameters:
+      - description: telephone number
+        in: path
+        minLength: 11
+        name: number
+        required: true
+        type: string
+      - description: owner id
+        in: body
+        minimum: 1
+        name: owner_id
+        required: true
+        schema:
+          type: integer
+      - description: icc id
+        in: body
+        minimum: 1
+        name: icc_id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+      summary: post a telephone information
+      tags:
+      - telephone
+    put:
+      description: modify the telephone information identified by number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: put a telephone information
+      tags:
+      - telephone
   /telephones/{number}:
     get:
       description: returns one telephone information by telephone number

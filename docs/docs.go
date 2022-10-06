@@ -42,6 +42,72 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "modify the telephone information identified by number",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "telephone"
+                ],
+                "summary": "put a telephone information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "register one telephone information by number",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "telephone"
+                ],
+                "summary": "post a telephone information",
+                "parameters": [
+                    {
+                        "minLength": 11,
+                        "type": "string",
+                        "description": "telephone number",
+                        "name": "number",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minimum": 1,
+                        "description": "owner id",
+                        "name": "owner_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "minimum": 1,
+                        "description": "icc id",
+                        "name": "icc_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/telephones/{number}": {
