@@ -13,6 +13,8 @@ import (
 
 var telephoneRepository repository.TelephoneRepository
 
+// NewHandler returns http.Handler.
+// this function configure a route path and middleware using go-chi/chi.
 func NewHandler(tr repository.TelephoneRepository) http.Handler {
 	r := chi.NewRouter()
 

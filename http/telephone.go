@@ -18,7 +18,7 @@ import (
 // @tags telephone
 // @produce json
 // @param number path string true "telephone number" minlength(11)
-// @success 200 {string} telephone-json
+// @success 200 {string} OK
 func getTelephone(w http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
 
@@ -45,7 +45,7 @@ func getTelephone(w http.ResponseWriter, r *http.Request) {
 // @router /telephones [get]
 // @tags telephone
 // @produce json
-// @success 200 {string} telephone-json
+// @success 200 {string} OK
 func listTelephone(w http.ResponseWriter, r *http.Request) {
 	telephone, err := telephoneRepository.ListTelephone()
 
@@ -69,7 +69,10 @@ func listTelephone(w http.ResponseWriter, r *http.Request) {
 // @router /telephones [post]
 // @tags telephone
 // @produce json
-// @success 200 {string} telephone-json
+// @param number path string true "telephone number" minlength(11)
+// @param owner_id body int true "owner id"
+// @param icc_id body int true "icc id"
+// @success 201 {string} Created
 func postTelephone(w http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
 
@@ -104,6 +107,16 @@ func postTelephone(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// putTelephone
+// @summary put a telephone information
+// @description modify the telephone information identified by number
+// @router /telephones [put]
+// @tags telephone
+// @produce json
+// @param number path string true "telephone number" minlength(11)
+// @param owner_id body int true "owner id"
+// @param icc_id body int true "icc id"
+// @success 200 {string} OK
 func putTelephone(w http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
 

@@ -15,8 +15,6 @@ import (
 	"github.com/kkitai/basic-backend-app-in-go/repository"
 )
 
-// TODO: add comments to all structures and functions
-
 // Env represents application environments.
 type Env struct {
 	LogLevel   string `default:"error"`
