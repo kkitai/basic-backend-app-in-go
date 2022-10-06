@@ -27,6 +27,7 @@ func getTelephone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to get a record: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 
 	tj, err := json.Marshal(telephone)
@@ -34,6 +35,7 @@ func getTelephone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to execute json.Marshal() on getTelephone(): %s", err.Error())
 		http.Error(w, http.StatusText(500), 500)
+		return
 	}
 
 	w.Write([]byte(tj))
@@ -89,16 +91,19 @@ func postTelephone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to covert owner_id in request body to integer on postTelephone: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 	iccId, err := strconv.Atoi(reqBody["icc_id"])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to covert icc_id in request body to integer on postTelephone: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 
 	if err = telephoneRepository.PostTelephone(ownerId, iccId, number); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to insert a record: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 
 	render.Status(r, http.StatusCreated)
@@ -131,11 +136,13 @@ func putTelephone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to covert owner_id in request body to integer on putTelephone: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 	iccId, err := strconv.Atoi(reqBody["icc_id"])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to covert icc_id in request body to integer on putTelephone: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 
 	defer r.Body.Close()
@@ -145,10 +152,18 @@ func putTelephone(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to get a record: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
 
 	if err := telephoneRepository.PutTelephoneByNumber(number, ownerId, iccId); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to update a record: %s\n", err)
 		http.Error(w, http.StatusText(400), 400)
+		return
 	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, map[string]interface{}{
+		"message": http.StatusText(200),
+	})
+
 }
