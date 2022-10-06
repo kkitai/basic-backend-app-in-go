@@ -17,7 +17,7 @@ $ docker run --rm -d \
      postgres
 
 $ docker exec -it postgres /bin/bash
-# psql -h localhost -p 5432 -U postgres
+# psql -h localhost -p 5432 -U postgres -d basic_backend_app_in_go
 ```
 
 ### Migrate Database
@@ -60,7 +60,7 @@ $ curl -X POST -H "Content-Type: application/json" http://localhost:3000/telepho
 ```
 
 ```
-$ curl -X PUT -H "Content-Type: application/json" http://localhost:3000/vessels/3EDD7  -d '{"name" : "BOKU IKEMEN", "owner_id": "44DF"}'
+$ curl -X PUT -H "Content-Type: application/json" http://localhost:3000/telephones/08033332222  -d '{"owner_id" : "2", "icc_id": "222222222222222"}'
 ```
 
 ## Testing
