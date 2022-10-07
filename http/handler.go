@@ -18,7 +18,6 @@ var telephoneRepository repository.TelephoneRepository
 func NewHandler(tr repository.TelephoneRepository) http.Handler {
 	r := chi.NewRouter()
 
-	// TODO: pass an arbitrary logger
 	r.Use(middleware.Logger)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
